@@ -20,7 +20,7 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
   constructor() {
     super();
     this.title = "";
-    this.url = " ";
+    this.url = "https://hax.psu.edu";
     this.t = this.t || {};
     this.t = {
       ...this.t,
@@ -42,16 +42,40 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
     }
   }
 
-  getData(url) {
-    return fetch("https://open-apis.hax.cloud/api/services/website/metadata?")
-      .then((response) => response.json())
-      .then((data) => {
-        this.data = data.data;
-        this.loading = false;
-        console.log(this.data);
-        return data;
-      });
+  async getData(link) {
+    const url = `https://open-apis.hax.cloud/api/services/website/metadata?q=${link}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      // console.log(json.data);
+      // document.querySelector("#here").innerHTML = JSON.stringify(
+      //   json.data,
+      //   null,
+      //   2
+      // );
+      // document.querySelector("#there").innerHTML = json.data["og:site_name"];
+      this.title = json.data.title;
+      console.log(json.data.description);
+      console.log(json.data.url);
+    } catch (error) {
+      console.error(error.message);
+    }
   }
+
+  // getData(url) {
+  //   return fetch("https://open-apis.hax.cloud/api/services/website/metadata?")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       this.data = data.data;
+  //       this.loading = false;
+  //       console.log(this.data);
+  //       return data;
+  //     });
+  // }
 
   // Lit reactive properties
   static get properties() {
@@ -91,9 +115,9 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
   // Lit render the HTML
   render() {
     return html` <div class="wrapper">
-      style= "color: ${this.data.color}"> ${this.data.url}
-      <h3><span>${this.t.title}:</span> ${this.title}</h3>
-      <slot></slot>
+      <div>${this.title}</div>
+      <div></div>
+      <div></div>
     </div>`;
   }
 
