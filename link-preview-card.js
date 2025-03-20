@@ -59,16 +59,23 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
       //   2
       // );
       // document.querySelector("#there").innerHTML = json.data["og:site_name"];
+      console.log(this.data);
       this.title =
         json.data["og:title"] || json.data["title"] || "Not Available";
       this.description = json.data["description"] || "Not Available";
-      this.image = this.image || "/assets/default-preview.png";
-      //  json.data["image"] ||
-      //  json.data["logo"] ||
-      //  json.data["og:image"] ||
-      // json.data["twitter:image"] ||
-      //  json.data["thumbnail"] ||
-      //  "";
+      this.image =
+        this.image ||
+        json.data["image"] ||
+        json.data["logo"] ||
+        json.data["og:image"] ||
+        json.data["og:image"] ||
+        "https://hax.psu.edu/" + json.data["og:image"] ||
+        json.data["msapplication-TileImage"] ||
+        json.data["msapplication-square310x310logo"] ||
+        json.data["msapplication-TileImage"] ||
+        json.data["ld+json"]["logo"] ||
+        json.data["og:image"] ||
+        "";
       this.link = json.data["url"] || link;
     } catch (error) {
       console.error("Error", error);
@@ -116,10 +123,10 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
           color: var(--ddd-theme-primary);
           background-color: var(--ddd-theme-accent);
           font-family: var(--ddd-font-navigation);
-          padding: 10px;
+          padding: var(--ddd-spacing-0);
           max-width: 400px;
-          border-radius: 10px;
-          border: 1px solid;
+          border-radius: var(--ddd-spacing-md);
+          border: var(--ddd-border-xs);
         }
         .wrapper {
           margin: var(--ddd-spacing-2);
@@ -127,14 +134,14 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
         }
         img {
           max-width: 100%;
-          border-radius: 10px;
+          border-radius: var(--ddd-radius-md);
         }
         .title {
           font-weight: bold;
           color: var(--ddd-primary-2);
         }
         .loading-spinner {
-          margin: 30px auto;
+          margin: var(--ddd-spacing-0);
           border: 8px solid #323ca8;
           width: 20px;
           height: 20px;
@@ -161,17 +168,25 @@ export class LinkPreviewCard extends DDDSuper(I18NMixin(LitElement)) {
   // Lit render the HTML
   render() {
     return html`
-      <div class="wrapper">
+      <div class="wrapper" part="wrapper">
         ${this.loading
-          ? html` <div class="loading-spinner"></div> `
+          ? html` <div class="loading-spinner" part="loading-spinner"></div> `
           : html`
               ${this.image
-                ? html` <img src="${this.image}" alt="Preview Image" />`
+                ? html` <img
+                    src="${this.image}"
+                    alt="Preview Image"
+                    alt=""
+                    @error="${this.handleImageError}"
+                    part="image"
+                  />`
                 : ""}
-              <div class="content">
-                <h3 class="title">${this.title}</h3>
-                <p class="desc">${this.description}</p>
-                <a href="${this.link}" target="_blank" class="url"
+              <div class="content" part="content">
+                <h3 class="title" part="title">${this.title}</h3>
+                <details part="details"></details>
+                <summary part="summary">Description</summary>
+                <p class="desc" part="desc">${this.description}</p>
+                <a href="${this.link}" target="_blank" class="url" part="url"
                   >Visit Site</a
                 >
               </div>
